@@ -1,6 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, workspace } from 'vscode';
 import {
     LanguageClient,
     LanguageClientOptions,
@@ -15,7 +15,7 @@ export function activate(context: ExtensionContext) {
     // const serverModule = context.asAbsolutePath(
     //     path.join('bin', 'protobuf-language-server')
     // );
-    const serverModule = 'protobuf-language-server';
+    const serverModule = workspace.getConfiguration('protobuf-language-server').get<string>('serverPath', 'protobuf-language-server');
     // let debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
