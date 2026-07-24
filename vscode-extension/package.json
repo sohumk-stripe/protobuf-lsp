@@ -34,7 +34,18 @@
               "path": "./syntaxes/proto.tmLanguage"
           }
       ],
-      "commands": []
+      "commands": [],
+      "configuration": {
+          "type": "object",
+          "title": "Protobuf Language Server",
+          "properties": {
+              "protobuf-language-server.serverPath": {
+                  "type": "string",
+                  "default": "protobuf-language-server",
+                  "description": "Path to the protobuf-language-server binary. Defaults to 'protobuf-language-server' (looked up in PATH)."
+              }
+          }
+      }
   },
   "scripts": {
       "vscode:prepublish": "yarn run compile",
