@@ -6,4 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.0.9] - 2026-07-27
+
+- Bug 修复和小改进
+
+## [0.0.8]
+
 - Initial release

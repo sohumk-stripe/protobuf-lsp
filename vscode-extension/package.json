@@ -4,7 +4,7 @@
   "description": "A language server implementation for Google Protocol Buffers",
   "repository": "https://github.com/lasorda/protobuf-language-server",
   "publisher": "panzhihao",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "engines": {
     "vscode": "^1.91.0"
   },
@@ -48,7 +48,7 @@
       }
   },
   "scripts": {
-      "vscode:prepublish": "yarn run compile",
+      "vscode:prepublish": "npm run compile",
       "compile": "tsc -p ./",
       "watch": "tsc -watch -p ./",
       "pretest": "yarn run compile && yarn run lint",
