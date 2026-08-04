@@ -1,0 +1,46 @@
+name: Publish VSCode Extension
+
+on:
+  push:
+    tags:
+      - 'v*' # 形如 v0.1.4 触发
+  workflow_dispatch: # 手动兜底
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 创建 GitHub Release 需要
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: vscode-extension
+        run: npm install
+
+      # 先发布到 Open VSX(默认 registry),同时打包出 vsix
+      - name: Publish to Open VSX
+        id: publishToOpenVSX
+        uses: HaaLeo/publish-vscode-extension@v2
+        with:
+          pat: ${{ secrets.OVSX_PAT }}
+          packagePath: vscode-extension
+
+      # 复用上一步打包好的 vsix,发布到 VS Code Marketplace
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v2
+        with:
+          pat: ${{ secrets.VSCE_PAT }}
+          registryUrl: https://marketplace.visualstudio.com
+          extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+
+      # tag 推送时自动创建 GitHub Release,跟随 tag
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: ${{ steps.publishToOpenVSX.outputs.vsixPath }}

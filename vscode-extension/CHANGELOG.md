@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-08-04
+
+- 同时发布到 Open VSX,支持 Cursor / VSCodium 等 Open VSX 兼容编辑器
+- 新增 GitHub Actions 自动发布工作流(打 tag 时发布到两个市场并创建 GitHub Release)
+
 ## [0.1.3] - 2026-07-27
 
 - Bug 修复和小改进
