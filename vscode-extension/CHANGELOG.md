@@ -6,9 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-## [0.1.5] - 2026-08-05
+## [0.1.5] - 2026-08-06
 - Added `additional-proto-dirs` setting to resolve proto imports from external directories
 - `additional-proto-dirs` now accepts absolute paths
+- `SettingsFromInterface` now also unwraps vscode-languageclient's nested settings format
 
 ## [0.1.4] - 2026-08-04
 
