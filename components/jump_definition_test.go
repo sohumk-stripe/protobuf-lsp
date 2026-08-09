@@ -57,11 +57,21 @@ func Test_getWord(t *testing.T) {
 			want: "protobuf",
 		},
 		{
-			name: "qualified name with dot",
+			name: "qualified name with dot incomplete",
 			args: args{
 				// cursor is right here                                           |
 				line:       "rpc MethodName(SearchDashboardReq) returns (google.protobuf.Empty) {",
 				idx:        53,
+				includeDot: true,
+			},
+			want: "google.protobuf",
+		},
+		{
+			name: "qualified name with dot complete",
+			args: args{
+				// cursor is right here                                                   |
+				line:       "rpc MethodName(SearchDashboardReq) returns (google.protobuf.Empty) {",
+				idx:        61,
 				includeDot: true,
 			},
 			want: "google.protobuf.Empty",
@@ -225,6 +235,75 @@ func Test_qualifierReferencesPackage(t *testing.T) {
 			if got := qualifierReferencesPackage(tt.queryPkg, tt.candidatePkg, tt.currentPkg); got != tt.want {
 				t.Errorf("qualifierReferencesPackage(%q, %q, %q) = %v, want %v",
 					tt.queryPkg, tt.candidatePkg, tt.currentPkg, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_splitPackage(t *testing.T) {
+	tests := []struct {
+		name         string
+		package_name string
+		rest         string
+		ok           bool
+	}{
+		{
+			name:         "Abc",
+			package_name: "",
+			rest:         "Abc",
+			ok:           true,
+		},
+		{
+			name:         ".Abc",
+			package_name: ".",
+			rest:         "Abc",
+			ok:           true,
+		},
+		{
+			name:         "Abc.Def",
+			package_name: "",
+			rest:         "Abc.Def",
+			ok:           true,
+		},
+		{
+			name:         "abc.Def",
+			package_name: "abc",
+			rest:         "Def",
+			ok:           true,
+		},
+		{
+			name:         ".abc.Def",
+			package_name: ".abc",
+			rest:         "Def",
+			ok:           true,
+		},
+		{
+			name: "",
+			ok:   false,
+		},
+		{
+			name: ".",
+			ok:   false,
+		},
+		{
+			name: ".foo.bar",
+			ok:   false,
+		},
+		{
+			name: ".foo.bar.",
+			ok:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			package_name, rest, ok := splitPackage(tt.name)
+			if ok != tt.ok {
+				t.Errorf("splitPackage(%q) = _, _, %v, want %v",
+					tt.name, ok, tt.ok)
+			}
+			if ok && (package_name != tt.package_name || rest != tt.rest) {
+				t.Errorf("splitPackage(%q) = %q, %q, %v, want %q, %q, %v",
+					tt.name, package_name, rest, ok, tt.package_name, tt.rest, tt.ok)
 			}
 		})
 	}

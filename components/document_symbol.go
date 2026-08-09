@@ -4,6 +4,7 @@ import (
 	"context"
 
 	protobuf "github.com/emicklei/proto"
+	"github.com/lasorda/protobuf-language-server/proto/parser"
 	"github.com/lasorda/protobuf-language-server/proto/view"
 
 	"github.com/lasorda/protobuf-language-server/go-lsp/logs"
@@ -136,47 +137,12 @@ func ProvideDocumentSymbol(ctx context.Context, req *defines.DocumentSymbolParam
 				End:   defines.Position{Line: uint(impLine)},
 			},
 		})
-
 	}
 	for _, enums := range file.Proto().Enums() {
-		enumProto := enums.Protobuf()
-		startLine := enumProto.Position.Line - 1
-		endLine := int(calculateEnumEndPosition(enumProto)) - 1
-		if endLine < startLine {
-			endLine = startLine
-		}
-		res = append(res, defines.DocumentSymbol{
-			Name: enumProto.Name,
-			Kind: defines.SymbolKindEnum,
-			SelectionRange: defines.Range{
-				Start: defines.Position{Line: uint(startLine)},
-				End:   defines.Position{Line: uint(startLine)},
-			},
-			Range: defines.Range{
-				Start: defines.Position{Line: uint(startLine)},
-				End:   defines.Position{Line: uint(endLine)},
-			},
-		})
+		res = addEnumDocumentSymbol(res, enums)
 	}
 	for _, message := range file.Proto().Messages() {
-		message_proto := message.Protobuf()
-		startLine := message_proto.Position.Line - 1
-		endLine := int(calculateMessageEndPosition(message_proto)) - 1
-		if endLine < startLine {
-			endLine = startLine
-		}
-		res = append(res, defines.DocumentSymbol{
-			Name: message_proto.Name,
-			Kind: defines.SymbolKindClass,
-			SelectionRange: defines.Range{
-				Start: defines.Position{Line: uint(startLine)},
-				End:   defines.Position{Line: uint(startLine)},
-			},
-			Range: defines.Range{
-				Start: defines.Position{Line: uint(startLine)},
-				End:   defines.Position{Line: uint(endLine)},
-			},
-		})
+		res = addMessageDocumentSymbol(res, message)
 	}
 	for _, service := range file.Proto().Services() {
 		serviceProto := service.Protobuf()
@@ -224,4 +190,54 @@ func ProvideDocumentSymbol(ctx context.Context, req *defines.DocumentSymbolParam
 	// }
 	// logs.Printf("dddddddd %+v", res)
 	return &res, nil
+}
+
+func addMessageDocumentSymbol(out []defines.DocumentSymbol, message parser.Message) []defines.DocumentSymbol {
+	children := []defines.DocumentSymbol{} // must be non-nil
+	for _, childMessage := range message.NestedMessages() {
+		children = addMessageDocumentSymbol(children, childMessage)
+	}
+	for _, childEnum := range message.NestedEnums() {
+		children = addEnumDocumentSymbol(children, childEnum)
+	}
+	message_proto := message.Protobuf()
+	startLine := message_proto.Position.Line - 1
+	endLine := int(calculateMessageEndPosition(message_proto)) - 1
+	if endLine < startLine {
+		endLine = startLine
+	}
+	return append(out, defines.DocumentSymbol{
+		Name: message_proto.Name,
+		Kind: defines.SymbolKindClass,
+		SelectionRange: defines.Range{
+			Start: defines.Position{Line: uint(startLine)},
+			End:   defines.Position{Line: uint(startLine)},
+		},
+		Range: defines.Range{
+			Start: defines.Position{Line: uint(startLine)},
+			End:   defines.Position{Line: uint(endLine)},
+		},
+		Children: &children,
+	})
+}
+
+func addEnumDocumentSymbol(out []defines.DocumentSymbol, enums parser.Enum) []defines.DocumentSymbol {
+	enumProto := enums.Protobuf()
+	startLine := enumProto.Position.Line - 1
+	endLine := int(calculateEnumEndPosition(enumProto)) - 1
+	if endLine < startLine {
+		endLine = startLine
+	}
+	return append(out, defines.DocumentSymbol{
+		Name: enumProto.Name,
+		Kind: defines.SymbolKindEnum,
+		SelectionRange: defines.Range{
+			Start: defines.Position{Line: uint(startLine)},
+			End:   defines.Position{Line: uint(startLine)},
+		},
+		Range: defines.Range{
+			Start: defines.Position{Line: uint(startLine)},
+			End:   defines.Position{Line: uint(endLine)},
+		},
+	})
 }
