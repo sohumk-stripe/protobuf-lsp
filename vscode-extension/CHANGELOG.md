@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-08-10
+- documentSymbol: 支持嵌套 message/enum 的展示
+- 跳转定义: 支持嵌套 message/enum 的 hover 与跳转引用
+- 支持 hover 嵌套 message/enum 的定义位置
+- 查找引用同样适用于嵌套 message/enum
+
 ## [0.1.5] - 2026-08-06
 - Added `additional-proto-dirs` setting to resolve proto imports from external directories
 - `additional-proto-dirs` now accepts absolute paths
