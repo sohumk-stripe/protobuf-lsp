@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-08-11
+- `additional-proto-dirs` now expands a leading `~/` to the user's home directory
+
 ## [0.1.6] - 2026-08-10
 - documentSymbol: 支持嵌套 message/enum 的展示
 - 跳转定义: 支持嵌套 message/enum 的 hover 与跳转引用
